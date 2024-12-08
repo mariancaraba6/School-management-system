@@ -12,3 +12,13 @@ class Student(db.Model):
         self.username = username
         self.password = password
         self.age = age
+
+    def serialize(self):
+        """
+        Serializes the object to a dictionary so it can be returned as JSON.
+        """
+        return {
+            'id': self.id,
+            'username': self.username,
+            'age': self.age
+        }

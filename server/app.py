@@ -13,10 +13,14 @@ with app.app_context():
     db.create_all()
 
     if not Student.query.first():  # Check if there are any students
-        default_student = Student(username="default_user", password="password123", age=20)
-        db.session.add(default_student)
+        student1 = Student(username='Carabinier', password='1234', age=20)
+        student2 = Student(username='Misulache', password='4321', age=21)
+        student3 = Student(username='Vladutz', password='4567', age=22)
+        db.session.add(student1)
+        db.session.add(student2)
+        db.session.add(student3)
         db.session.commit()
-        print("Default student created.")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
