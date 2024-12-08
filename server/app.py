@@ -1,24 +1,32 @@
+import os
+from dotenv import load_dotenv
+
 from flask import Flask
-from config import Config
-from models import db, Student
-from routes import student_bp
+from flask_cors import CORS
+
+from models import db, Account
+from routes import student_bp, login_bp
 
 app = Flask(__name__)
+load_dotenv()
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-app.config.from_object(Config)
-app.register_blueprint(student_bp)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
+
+app.register_blueprint(login_bp, url_prefix='/api')
 
 with app.app_context():
     db.create_all()
 
-    if not Student.query.first():  # Check if there are any students
-        student1 = Student(username='Carabinier', password='1234', age=20)
-        student2 = Student(username='Misulache', password='4321', age=21)
-        student3 = Student(username='Vladutz', password='4567', age=22)
-        db.session.add(student1)
-        db.session.add(student2)
-        db.session.add(student3)
+    if not Account.query.first():  # Check if there are any accounts
+        account1 = Account("carabinierii@gmail.com", "123456", "admin")
+        account2 = Account("student@misulache.com", "123456", "student")
+        account3 = Account("professor@vladutz.com", "123456", "professor")
+        db.session.add(account1)
+        db.session.add(account2)
+        db.session.add(account3)
         db.session.commit()
 
 
