@@ -4,8 +4,8 @@ export const getToken = () => {
     return sessionStorage.getItem("token");
 };
 
-export const getAuthorizationField = () => ({
-    Authorization: "Bearer " + getToken(),
-});
+export const setToken = (token) => {
+    sessionStorage.setItem("token", token);
+};
 
 export { URL };

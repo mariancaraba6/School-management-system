@@ -11,17 +11,32 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { loginRequest } from "../../api/login";
+import { setToken } from "../../api/utils";
 
 export default function LoginPage(props) {
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+    const [accountError, setAccountError] = React.useState(false);
+    const [accountErrorMessage, setAccountErrorMessage] = React.useState("");
 
     const sendLoginRequest = async (email, password) => {
         try {
             const response = await loginRequest(email, password);
-            console.log(response);
+            if (response.status === 200) {
+                console.log("Login successful!");
+                const data = await response.json();
+                const token = data.token;
+                setToken(token);
+                console.log("Token: ", token);
+                setAccountError(false);
+                setAccountErrorMessage("");
+                props.setLoggedIn(true);
+                return;
+            }
+            setAccountError(true);
+            setAccountErrorMessage("Invalid email or password.");
         } catch (error) {
             console.error("Error logging in: ", error);
         }
@@ -151,6 +166,11 @@ export default function LoginPage(props) {
                     >
                         Sign in
                     </Button>
+                    {accountError && (
+                        <Typography color="error" style={{ margin: "auto" }}>
+                            {accountErrorMessage}
+                        </Typography>
+                    )}
                     <Link
                         component="button"
                         type="button"

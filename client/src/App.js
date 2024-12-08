@@ -1,28 +1,18 @@
-import logo from "./logo.svg";
-import "./App.css";
-import NavBar from "./NavBar";
-import LoginPage from "./components/login/LoginPage.js";
+import React from "react";
+import LoginPage from "./components/login/LoginPage";
+import StudentLayoutPage from "./components/student/StudentLayoutPage";
 
 function App() {
+    const [loggedIn, setLoggedIn] = React.useState(false);
+
     return (
-        <div className="App">
-            {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.marilu
-        </p>
-        <NavBar name="marilu" />
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-            <LoginPage />
-        </div>
+        <>
+            {loggedIn ? (
+                <StudentLayoutPage setLoggedIn={setLoggedIn} />
+            ) : (
+                <LoginPage setLoggedIn={setLoggedIn} />
+            )}
+        </>
     );
 }
 
