@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
-from models import db, Account, Student, Grade, Course, Absence
-from routes import jwt, student_bp, login_bp
+from models import db, Account, Student, Grade, Course, Absence, Professor
+from routes import jwt, student_bp, login_bp, professor_bp
 
 app = Flask(__name__)
 load_dotenv()
@@ -18,6 +18,7 @@ db.init_app(app)
 
 app.register_blueprint(login_bp, url_prefix='/api')
 app.register_blueprint(student_bp, url_prefix='/api')
+app.register_blueprint(professor_bp, url_prefix='/api')
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
@@ -45,11 +46,18 @@ with app.app_context():
         abscence4 = Absence(course2.course_id, student1.student_id, "2021-09-01")
         abscence5 = Absence(course2.course_id, student1.student_id, "2021-09-02")
 
+        account2 = Account("sandor_niko@eminescusm.ro", "niko123", "professor")
+        professor1 = Professor("Sandor", "Nicolae", account2.email, "SND01")
+
         db.session.add(account1)
         db.session.add(student1)
         db.session.add_all([course1, course2, course3])
         db.session.add_all([grade1, grade2, grade3, grade4, grade5, grade6])
         db.session.add_all([abscence1, abscence2, abscence3, abscence4, abscence5])
+
+        db.session.add(account2)
+        db.session.add(professor1)
+
         db.session.commit()
 
 

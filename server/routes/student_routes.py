@@ -8,7 +8,12 @@ student_bp = Blueprint('student', __name__)
 @jwt_required()
 def get_student_grades():
     try:
-        student_id = get_jwt_identity()
+        identity = get_jwt_identity()
+        role = identity.split()[0]
+        student_id = identity.split()[1]
+        if role != "student":
+            return jsonify({"error": "Invalid role"}), 400
+
         student = Student.query.filter_by(student_id=student_id).first()
         if student is None:
             return jsonify({"error": "Student not found"}), 404
@@ -36,7 +41,12 @@ def get_student_grades():
 @jwt_required()
 def get_student_details():
     try:
-        student_id = get_jwt_identity()
+        identity = get_jwt_identity()
+        role = identity.split()[0]
+        student_id = identity.split()[1]
+        if role != "student":
+            return jsonify({"error": "Invalid role"}), 400
+
         student = Student.query.filter_by(student_id=student_id).first()
         if student is None:
             return jsonify({"error": "Student not found"}), 404
