@@ -12,14 +12,16 @@ import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { loginRequest } from "../../api/login";
 import { setToken } from "../../api/utils";
+import { useNavigate } from "react-router-dom";
 
-export default function LoginPage(props) {
+export default function LoginPage() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [accountError, setAccountError] = React.useState(false);
   const [accountErrorMessage, setAccountErrorMessage] = React.useState("");
+  const navigate = useNavigate();
 
   const sendLoginRequest = async (email, password) => {
     try {
@@ -32,8 +34,7 @@ export default function LoginPage(props) {
         console.log("Token: ", token);
         setAccountError(false);
         setAccountErrorMessage("");
-        props.setLoggedIn(true);
-        return;
+        return navigate("/");
       }
       setAccountError(true);
       setAccountErrorMessage("Invalid email or password.");

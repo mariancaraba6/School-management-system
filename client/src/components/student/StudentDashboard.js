@@ -3,14 +3,21 @@ import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
 import GradesSection from "./GradesSection";
 import { getDetailsRequest, getGradesRequest } from "../../api/student";
+import { useNavigate } from "react-router-dom";
 
-const StudentDashboard = (props) => {
+const StudentDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [grades, setGrades] = useState([]);
   const [studentDetails, setStudentDetails] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+
+  const logout = () => {
+    sessionStorage.removeItem("token");
+    return navigate("/login");
   };
 
   useEffect(() => {
@@ -39,7 +46,7 @@ const StudentDashboard = (props) => {
         setLoading(false);
       } catch (error) {
         console.error("Error getting grades: ", error);
-        props.onLogout();
+        logout();
       }
     }
     fetchData();
@@ -66,7 +73,7 @@ const StudentDashboard = (props) => {
       <NavBar
         tabIndex={tabIndex}
         handleTabChange={handleTabChange}
-        onLogout={props.onLogout}
+        onLogout={logout}
       />
 
       {/* Main Content */}
