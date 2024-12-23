@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models import db, Student, Grade, Course
+from models import db, Student, Grade, Course, Absence
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 student_bp = Blueprint('student', __name__)
@@ -14,12 +14,19 @@ def get_student_grades():
             return jsonify({"error": "Student not found"}), 404
 
         grades = Grade.query.filter_by(student_id=student.student_id).all()
-        results = []
-        for grade in grades:
-            course = Course.query.filter_by(course_id=grade.course_id).first()
+        absences = Absence.query.filter_by(student_id=student.student_id).order_by(Absence.date).all()
+        course_ids = list(set((map(lambda grade: grade.course_id, grades))))
+        courses = []
+        for course_id in course_ids:
+            grades_for_course = list(filter(lambda grade: grade.course_id == course_id, grades))
+            absences_for_course = list(filter(lambda absence: absence.course_id == course_id, absences))
+            course = Course.query.filter_by(course_id=course_id).first()
             if course:
-                results.append({"courseName": course.course_name, "courseCode": course.course_id, "finalGrade": grade.grade, "absences": []})
-        return jsonify({"grades": results}), 200
+                courses.append({"courseName": course.course_name, 
+                                "courseCode": course.course_id, 
+                                "grades": [{"grade": grade.grade, "percentage": grade.percentage, "description": grade.description, "index": grade.index, "date": grade.date} for grade in grades_for_course], 
+                                "absences": [{"date": absence.date} for absence in absences_for_course]})
+        return jsonify({"courses": courses}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500

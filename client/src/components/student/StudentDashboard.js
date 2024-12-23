@@ -7,7 +7,6 @@ import { getDetailsRequest, getGradesRequest } from "../../api/student";
 const StudentDashboard = (props) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [grades, setGrades] = useState([]);
-  const [absences, setAbsences] = useState([]);
   const [studentDetails, setStudentDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const handleTabChange = (event, newValue) => {
@@ -24,8 +23,9 @@ const StudentDashboard = (props) => {
           studentDetailsResponse.status !== 200 ||
           studentGradesResponse.status !== 200
         ) {
-          props.onLogout();
-          return;
+          throw new Error(
+            `Stauts getting details: ${studentDetailsResponse.status}, getting grades: ${studentGradesResponse.status}.`
+          );
         }
 
         const studentDetailsData = await studentDetailsResponse.json();
@@ -34,11 +34,12 @@ const StudentDashboard = (props) => {
 
         const studentGradesData = await studentGradesResponse.json();
         console.log("Grades: ", studentGradesData);
-        setGrades(studentGradesData["grades"]);
+        setGrades(studentGradesData["courses"]);
 
         setLoading(false);
       } catch (error) {
         console.error("Error getting grades: ", error);
+        props.onLogout();
       }
     }
     fetchData();
@@ -73,22 +74,13 @@ const StudentDashboard = (props) => {
         {tabIndex === 0 && (
           <Box>
             <Typography variant="h4" gutterBottom color="primary">
-              Grades
+              Courses
             </Typography>
             <GradesSection courses={grades} />
           </Box>
         )}
 
         {tabIndex === 1 && (
-          <Box>
-            <Typography variant="h4" gutterBottom color="secondary">
-              Absences
-            </Typography>
-            {/* Absences content goes here */}
-          </Box>
-        )}
-
-        {tabIndex === 2 && (
           <Box>
             <Typography variant="h4" gutterBottom color="textSecondary">
               Personal Details
