@@ -1,19 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
 import GradesSection from "./GradesSection";
+import { getDetailsRequest, getGradesRequest } from "../../api/student";
 
 const StudentDashboard = (props) => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [grades, setGrades] = useState([]);
+  const [absences, setAbsences] = useState([]);
+  const [studentDetails, setStudentDetails] = useState({});
+  const [loading, setLoading] = useState(true);
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
 
-  // const handleLogout = () => {
-  //   // Clear the session storage and navigate to login page
-  //   sessionStorage.removeItem("token");
-  //   navigate("/login");
-  // };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const studentDetailsResponse = await getDetailsRequest();
+        const studentGradesResponse = await getGradesRequest();
+
+        if (
+          studentDetailsResponse.status !== 200 ||
+          studentGradesResponse.status !== 200
+        ) {
+          props.onLogout();
+          return;
+        }
+
+        const studentDetailsData = await studentDetailsResponse.json();
+        console.log("Details: ", studentDetailsData);
+        setStudentDetails(studentDetailsData);
+
+        const studentGradesData = await studentGradesResponse.json();
+        console.log("Grades: ", studentGradesData);
+        setGrades(studentGradesData["grades"]);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error getting grades: ", error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Typography variant="h6">Loading...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ padding: 4, backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
@@ -31,22 +75,7 @@ const StudentDashboard = (props) => {
             <Typography variant="h4" gutterBottom color="primary">
               Grades
             </Typography>
-            <GradesSection
-              courses={[
-                {
-                  courseName: "Mathematics",
-                  courseCode: "MATH101",
-                  finalGrade: "9.5",
-                  absences: ["2024-01-15", "2024-02-12"],
-                },
-                {
-                  courseName: "Physics",
-                  courseCode: "PHYS201",
-                  finalGrade: "8.7",
-                  absences: ["2024-01-10"],
-                },
-              ]}
-            />
+            <GradesSection courses={grades} />
           </Box>
         )}
 
@@ -64,7 +93,17 @@ const StudentDashboard = (props) => {
             <Typography variant="h4" gutterBottom color="textSecondary">
               Personal Details
             </Typography>
-            {/* Personal details content goes here */}
+            {studentDetails && (
+              <>
+                <p>Class: {studentDetails.class_name}</p>
+                <p>Student ID: {studentDetails.student_id}</p>
+                <p>
+                  Name:{" "}
+                  {studentDetails.first_name + " " + studentDetails.last_name}
+                </p>
+                <p>Email: {studentDetails.email}</p>
+              </>
+            )}
           </Box>
         )}
       </Paper>

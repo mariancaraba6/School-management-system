@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models import db, Student, Grade
+from models import db, Student, Grade, Course
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 student_bp = Blueprint('student', __name__)
@@ -14,7 +14,12 @@ def get_student_grades():
             return jsonify({"error": "Student not found"}), 404
 
         grades = Grade.query.filter_by(student_id=student.student_id).all()
-        return jsonify({"grades": [(grade.course_id, grade.grade) for grade in grades]}), 200
+        results = []
+        for grade in grades:
+            course = Course.query.filter_by(course_id=grade.course_id).first()
+            if course:
+                results.append({"courseName": course.course_name, "courseCode": course.course_id, "finalGrade": grade.grade, "absences": []})
+        return jsonify({"grades": results}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
@@ -29,7 +34,8 @@ def get_student_details():
         if student is None:
             return jsonify({"error": "Student not found"}), 404
 
-        return jsonify({"first_name": student.first_name, "last_name": student.last_name, "email": student.email, "student_id": student.student_id}), 200
+        return jsonify({"first_name": student.first_name, "last_name": student.last_name, "email": student.email, "student_id": student.student_id, 
+                        "class_name": student.class_name}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
