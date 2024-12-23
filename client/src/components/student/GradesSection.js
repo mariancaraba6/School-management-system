@@ -16,11 +16,31 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+const getFinalGrade = (grades) => {
+  let final = 0;
+  for (const grade of grades) {
+    final += grade.grade * grade.percentage;
+  }
+  return final;
+};
+
+const getDateFormat = (date) => {
+  const now = new Date(date);
+  let year = now.getFullYear();
+  let month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-based
+  let day = now.getDate().toString().padStart(2, "0");
+  let hour = now.getHours().toString().padStart(2, "0");
+  let minute = now.getMinutes().toString().padStart(2, "0");
+
+  let formattedDate = `${year}-${month}-${day} ${hour}:${minute}`;
+  return formattedDate;
+};
+
 const GradesSection = ({ courses }) => {
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
-        Your Grades
+        Courses Overview
       </Typography>
 
       {courses.map((course, index) => (
@@ -38,38 +58,65 @@ const GradesSection = ({ courses }) => {
               Final Grade:{" "}
               <strong
                 style={{
-                  color: course.finalGrade >= 5 ? "green" : "red",
+                  color: getFinalGrade(course.grades) >= 5 ? "green" : "red",
                 }}
               >
-                {course.finalGrade}
+                {getFinalGrade(course.grades).toFixed(2)}
               </strong>
             </Typography>
           </CardContent>
 
-          {/* Accordion for Absences */}
           <Accordion>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>View Absences</Typography>
+              <Typography>View All Grades</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {course.grades.length > 0 ? (
+                <TableContainer>
+                  <Table>
+                    <TableBody>
+                      {course.grades
+                        .sort((a, b) => a.id - b.id)
+                        .map((grade, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell>{`${grade.description} (${(
+                              grade.percentage * 100
+                            ).toFixed(2)}%)`}</TableCell>
+                            <TableCell>{grade.grade.toFixed(2)}</TableCell>
+                            <TableCell>
+                              {new Date(grade.date).toDateString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography>No grades recorded for this course.</Typography>
+              )}
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>View All Absences</Typography>
             </AccordionSummary>
             <AccordionDetails>
               {course.absences.length > 0 ? (
                 <TableContainer>
                   <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
                     <TableBody>
                       {course.absences.map((absence, idx) => (
                         <TableRow key={idx}>
-                          <TableCell>{absence}</TableCell>
-                          <TableCell>Absent</TableCell>
+                          <TableCell>{getDateFormat(absence.date)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

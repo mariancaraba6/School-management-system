@@ -3,15 +3,21 @@ import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
 import GradesSection from "./GradesSection";
 import { getDetailsRequest, getGradesRequest } from "../../api/student";
+import { useNavigate } from "react-router-dom";
 
-const StudentDashboard = (props) => {
+const StudentDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [grades, setGrades] = useState([]);
-  const [absences, setAbsences] = useState([]);
   const [studentDetails, setStudentDetails] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+
+  const logout = () => {
+    sessionStorage.removeItem("token");
+    return navigate("/login");
   };
 
   useEffect(() => {
@@ -24,8 +30,9 @@ const StudentDashboard = (props) => {
           studentDetailsResponse.status !== 200 ||
           studentGradesResponse.status !== 200
         ) {
-          props.onLogout();
-          return;
+          throw new Error(
+            `Stauts getting details: ${studentDetailsResponse.status}, getting grades: ${studentGradesResponse.status}.`
+          );
         }
 
         const studentDetailsData = await studentDetailsResponse.json();
@@ -34,11 +41,12 @@ const StudentDashboard = (props) => {
 
         const studentGradesData = await studentGradesResponse.json();
         console.log("Grades: ", studentGradesData);
-        setGrades(studentGradesData["grades"]);
+        setGrades(studentGradesData["courses"]);
 
         setLoading(false);
       } catch (error) {
         console.error("Error getting grades: ", error);
+        logout();
       }
     }
     fetchData();
@@ -65,7 +73,7 @@ const StudentDashboard = (props) => {
       <NavBar
         tabIndex={tabIndex}
         handleTabChange={handleTabChange}
-        onLogout={props.onLogout}
+        onLogout={logout}
       />
 
       {/* Main Content */}
@@ -73,22 +81,13 @@ const StudentDashboard = (props) => {
         {tabIndex === 0 && (
           <Box>
             <Typography variant="h4" gutterBottom color="primary">
-              Grades
+              Courses
             </Typography>
             <GradesSection courses={grades} />
           </Box>
         )}
 
         {tabIndex === 1 && (
-          <Box>
-            <Typography variant="h4" gutterBottom color="secondary">
-              Absences
-            </Typography>
-            {/* Absences content goes here */}
-          </Box>
-        )}
-
-        {tabIndex === 2 && (
           <Box>
             <Typography variant="h4" gutterBottom color="textSecondary">
               Personal Details

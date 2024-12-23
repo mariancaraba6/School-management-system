@@ -22,7 +22,7 @@ def login_user():
             if student is None:
                 return jsonify({"error": "Student not found"}), 404
             token = create_access_token(identity=student.student_id)
-            return jsonify({"token": token}), 200
+            return jsonify({"token": token, "role": "student"}), 200
         
         return jsonify({"error": "Invalid role"}), 400
 
