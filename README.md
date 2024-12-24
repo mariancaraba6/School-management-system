@@ -1,3 +1,3 @@
 # School Management System
 
-Created by marilu, vladutz, misha
+Created by Caraba Marian, Roatis Vlad and David Mihai

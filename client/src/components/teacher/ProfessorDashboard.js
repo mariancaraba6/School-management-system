@@ -3,9 +3,15 @@ import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
 import GradesManagementSection from "./GradesManagementSection";
 import AttendanceSection from "./AttendanceSection";
+import { useNavigate } from "react-router-dom";
 
-const TeacherDashboard = ({ onLogout }) => {
+const ProfessorDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const navigate = useNavigate();
+  const logout = () => {
+    sessionStorage.removeItem("token");
+    return navigate("/login");
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -16,7 +22,7 @@ const TeacherDashboard = ({ onLogout }) => {
       <NavBar
         tabIndex={tabIndex}
         handleTabChange={handleTabChange}
-        onLogout={onLogout}
+        onLogout={logout}
       />
 
       <Paper elevation={3} sx={{ padding: 3, marginTop: 2 }}>
@@ -53,4 +59,4 @@ const TeacherDashboard = ({ onLogout }) => {
   );
 };
 
-export default TeacherDashboard;
+export default ProfessorDashboard;
