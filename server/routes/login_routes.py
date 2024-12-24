@@ -41,7 +41,6 @@ def login_user():
 @login_bp.route('/verify-account', methods=['GET'])
 @jwt_required()
 def verify_account():
-    print("verify-account")
     try:
         identity = get_jwt_identity()
         role = identity.split()[0]

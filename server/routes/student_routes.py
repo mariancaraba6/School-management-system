@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models import db, Student, Grade, Course, Absence
+from models import db, Student, Grade, Course, Absence, Enrolment
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 student_bp = Blueprint('student', __name__)
@@ -18,20 +18,25 @@ def get_student_grades():
         if student is None:
             return jsonify({"error": "Student not found"}), 404
 
-        grades = Grade.query.filter_by(student_id=student.student_id).all()
-        absences = Absence.query.filter_by(student_id=student.student_id).order_by(Absence.date).all()
-        course_ids = list(set((map(lambda grade: grade.course_id, grades))))
-        courses = []
-        for course_id in course_ids:
-            grades_for_course = list(filter(lambda grade: grade.course_id == course_id, grades))
-            absences_for_course = list(filter(lambda absence: absence.course_id == course_id, absences))
-            course = Course.query.filter_by(course_id=course_id).first()
+        all_grades = Grade.query.filter_by(student_id=student.student_id).all()
+        enroled_courses = Enrolment.query.filter_by(student_id=student.student_id).all()
+        all_absences = Absence.query.filter_by(student_id=student.student_id).order_by(Absence.date).all()
+        result = []
+        for enrolment in enroled_courses:
+            grades_for_course = list(filter(lambda grade: grade.course_id == enrolment.course_id, all_grades))
+            id_to_grade = {grade.index: (grade.grade, grade.date) for grade in grades_for_course}
+            absences_for_course = list(filter(lambda absence: absence.course_id == enrolment.course_id, all_absences))
+            course = Course.query.filter_by(course_id=enrolment.course_id).first()
             if course:
-                courses.append({"courseName": course.course_name, 
+                result.append({"courseName": course.course_name, 
                                 "courseCode": course.course_id, 
-                                "grades": [{"grade": grade.grade, "percentage": grade.percentage, "description": grade.description, "index": grade.index, "date": grade.date} for grade in grades_for_course], 
+                                "grades": [{"grade": id_to_grade[index][0] if (index in id_to_grade) else "null", 
+                                            "percentage": component[0], 
+                                            "description": component[1], 
+                                            "index": index, 
+                                            "date": id_to_grade[index][1] if (index in id_to_grade) else "null"} for index, component in enumerate(course.grade_components)], 
                                 "absences": [{"date": absence.date} for absence in absences_for_course]})
-        return jsonify({"courses": courses}), 200
+        return jsonify({"courses": result}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
