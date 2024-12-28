@@ -1,9 +1,9 @@
 import React from "react";
 import { AppBar, Tabs, Tab, Box, IconButton, Tooltip } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import SchoolIcon from "@mui/icons-material/School";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AddIcon from "@mui/icons-material/Add";
 
 const NavBar = ({ tabIndex, handleTabChange, onLogout }) => {
   return (
@@ -46,13 +46,18 @@ const NavBar = ({ tabIndex, handleTabChange, onLogout }) => {
           }}
         >
           <Tab
-            icon={<AssignmentIcon />}
-            label="Courses"
+            icon={<AddIcon />}
+            label="Add Students"
             sx={{ textTransform: "none", fontSize: "1rem" }}
           />
           <Tab
-            icon={<PersonIcon />}
-            label="Personal Details"
+            icon={<AddIcon />}
+            label="Add Professors"
+            sx={{ textTransform: "none", fontSize: "1rem" }}
+          />
+          <Tab
+            icon={<AddIcon />}
+            label="Add Courses"
             sx={{ textTransform: "none", fontSize: "1rem" }}
           />
         </Tabs>

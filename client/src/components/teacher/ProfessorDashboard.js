@@ -5,6 +5,7 @@ import ManageGrades from "./ManageGrades";
 import ManageAttendance from "./ManageAttendance";
 import { useNavigate } from "react-router-dom";
 import MyCourses from "./MyCourses";
+import Chat from "./Chat";
 import { getDetailsRequest, getGradesRequest } from "../../api/professor";
 import LoadingPage from "../../LoadingPage";
 
@@ -71,7 +72,12 @@ const ProfessorDashboard = () => {
         <Paper elevation={3} sx={{ padding: 3, marginTop: 2 }}>
           {tabIndex === 0 && (
             <Box>
-              <Typography variant="h4" gutterBottom color="primary">
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="secondary"
+                sx={{ fontWeight: "bold" }}
+              >
                 My Courses
               </Typography>
               <MyCourses courses={professorData["courses"]} />
@@ -80,7 +86,12 @@ const ProfessorDashboard = () => {
 
           {tabIndex === 1 && (
             <Box>
-              <Typography variant="h4" gutterBottom color="primary">
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="secondary"
+                sx={{ fontWeight: "bold" }}
+              >
                 Manage Grades
               </Typography>
               <ManageGrades courses={professorData["courses"]} />
@@ -89,7 +100,12 @@ const ProfessorDashboard = () => {
 
           {tabIndex === 2 && (
             <Box>
-              <Typography variant="h4" gutterBottom color="secondary">
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="secondary"
+                sx={{ fontWeight: "bold" }}
+              >
                 Manage Attendance
               </Typography>
               <ManageAttendance courses={professorData["courses"]} />
@@ -98,7 +114,26 @@ const ProfessorDashboard = () => {
 
           {tabIndex === 3 && (
             <Box>
-              <Typography variant="h4" gutterBottom color="secondary">
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="compl"
+                sx={{ fontWeight: "bold" }}
+              >
+                Chat
+              </Typography>
+              <Chat />
+            </Box>
+          )}
+
+          {tabIndex === 4 && (
+            <Box>
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="secondary"
+                sx={{ fontWeight: "bold" }}
+              >
                 Personal Details
               </Typography>
               {professorData["details"] && (

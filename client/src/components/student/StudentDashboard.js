@@ -87,7 +87,7 @@ const StudentDashboard = () => {
                 color="secondary"
                 sx={{ fontWeight: "bold" }}
               >
-                Courses
+                My Courses
               </Typography>
               <Courses courses={studentData["grades"]} />
             </Box>

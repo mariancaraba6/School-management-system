@@ -4,6 +4,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import SchoolIcon from "@mui/icons-material/School";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ChatIcon from "@mui/icons-material/Chat";
 
 const NavBar = ({ tabIndex, handleTabChange, onLogout }) => {
   return (
@@ -58,6 +59,11 @@ const NavBar = ({ tabIndex, handleTabChange, onLogout }) => {
           <Tab
             icon={<SchoolIcon />}
             label="Manage Attendance"
+            sx={{ textTransform: "none", fontSize: "1rem" }}
+          />
+          <Tab
+            icon={<ChatIcon />}
+            label="Chat"
             sx={{ textTransform: "none", fontSize: "1rem" }}
           />
           <Tab
