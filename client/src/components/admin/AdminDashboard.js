@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
 import { useNavigate } from "react-router-dom";
+import AddCourses from "./AddCourses";
+import AddProfessors from "./AddProfessors";
+import AddStudents from "./AddStudents";
 
-const ProfessorDashboard = () => {
+const AdminDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const navigate = useNavigate();
   const logout = () => {
@@ -26,41 +29,43 @@ const ProfessorDashboard = () => {
       <Paper elevation={3} sx={{ padding: 3, marginTop: 2 }}>
         {tabIndex === 0 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="primary">
-              My Courses
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="secondary"
+              sx={{ fontWeight: "bold" }}
+            >
+              Add Students
             </Typography>
-            {/* <MyCourses /> */}
+            <AddStudents />
           </Box>
         )}
 
         {tabIndex === 1 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="primary">
-              Manage Grades
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="secondary"
+              sx={{ fontWeight: "bold" }}
+            >
+              Add Professors
             </Typography>
-            {/* <ManageGrades /> */}
+            <AddProfessors />
           </Box>
         )}
 
         {tabIndex === 2 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="secondary">
-              Manage Attendance
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="secondary"
+              sx={{ fontWeight: "bold" }}
+            >
+              Add Courses
             </Typography>
-            {/* <ManageAttendance /> */}
-          </Box>
-        )}
-
-        {tabIndex === 3 && (
-          <Box>
-            <Typography variant="h4" gutterBottom color="secondary">
-              Personal Details
-            </Typography>
-            <Typography variant="body1">
-              <p>Name: John Doe</p>
-              <p>Email: johndoe@example.com</p>
-              <p>Subject: Mathematics</p>
-            </Typography>
+            <AddCourses />
           </Box>
         )}
       </Paper>
@@ -68,4 +73,4 @@ const ProfessorDashboard = () => {
   );
 };
 
-export default ProfessorDashboard;
+export default AdminDashboard;

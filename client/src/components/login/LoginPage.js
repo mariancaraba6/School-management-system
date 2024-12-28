@@ -133,7 +133,7 @@ export default function LoginPage() {
               required
               fullWidth
               variant="outlined"
-              color={emailError ? "error" : "primary"}
+              color={emailError ? "error" : "secondary"}
             />
           </FormControl>
           <FormControl>
@@ -150,18 +150,15 @@ export default function LoginPage() {
               required
               fullWidth
               variant="outlined"
-              color={passwordError ? "error" : "primary"}
+              color={passwordError ? "error" : "secondary"}
             />
           </FormControl>
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             onClick={validateInputs}
+            color="secondary"
           >
             Sign in
           </Button>
