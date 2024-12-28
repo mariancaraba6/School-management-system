@@ -8,3 +8,12 @@ export const getDetailsRequest = async () => {
     },
   });
 };
+
+export const getGradesRequest = async () => {
+  return fetch(URL + "professor/courses", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+};

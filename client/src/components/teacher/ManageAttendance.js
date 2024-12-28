@@ -19,21 +19,7 @@ import {
   DialogTitle,
   Stack,
 } from "@mui/material";
-
-const mockCourses = [
-  { id: "course1", name: "Mathematics" },
-  { id: "course2", name: "Physics" },
-  { id: "course3", name: "Chemistry" },
-];
-
-const mockStudents = {
-  course1: [
-    { id: "student1", name: "John Doe", absences: [] },
-    { id: "student2", name: "Jane Smith", absences: [] },
-  ],
-  course2: [{ id: "student3", name: "Albert Einstein", absences: [] }],
-  course3: [{ id: "student4", name: "Marie Curie", absences: [] }],
-};
+import { submitAbsenceRequest } from "../../api/student";
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -43,7 +29,17 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-const ManageAttendance = () => {
+const getDateFormat = (date) => {
+  const now = new Date(date);
+  let year = now.getFullYear();
+  let month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-based
+  let day = now.getDate().toString().padStart(2, "0");
+
+  let formattedDate = `${year}-${month}-${day}`;
+  return formattedDate;
+};
+
+const ManageAttendance = (props) => {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [students, setStudents] = useState([]);
   const [openMotivateDialog, setOpenMotivateDialog] = useState(false);
@@ -51,15 +47,39 @@ const ManageAttendance = () => {
 
   useEffect(() => {
     if (selectedCourse) {
-      setStudents(mockStudents[selectedCourse] || []);
+      setStudents(props.courses[selectedCourse]["enroledStudents"]);
     }
   }, [selectedCourse]);
 
+  const saveAbsences = async (studentId, absences) => {
+    try {
+      const student = students.find((s) => s.studentId === studentId);
+      if (!student) return;
+      console.log(
+        `Saving absences for course ${selectedCourse} for student ${student.studentId}`,
+        absences
+      );
+      const response = await submitAbsenceRequest(
+        selectedCourse,
+        student.studentId,
+        absences
+      );
+      console.log("Response: ", response);
+      if (response.status >= 400 && response.status < 500) {
+        const message = await response.json();
+        console.error("Error saving absences: ", message);
+        return;
+      }
+    } catch (error) {
+      console.error("Error saving absences: ", error);
+    }
+  };
+
   const addAbsence = (studentId) => {
     const currentDate = getCurrentDate();
-    setStudents((prevStudents) =>
-      prevStudents.map((student) => {
-        if (student.id === studentId) {
+    setStudents((prevStudents) => {
+      const result = prevStudents.map((student) => {
+        if (student.studentId === studentId) {
           return {
             ...student,
             absences: [
@@ -69,21 +89,31 @@ const ManageAttendance = () => {
           };
         }
         return student;
-      })
-    );
+      });
+      saveAbsences(
+        studentId,
+        result.find((s) => s.studentId === studentId).absences
+      );
+      return result;
+    });
   };
 
   const motivateAbsence = (studentId, absenceIndex) => {
-    setStudents((prevStudents) =>
-      prevStudents.map((student) => {
-        if (student.id === studentId) {
+    setStudents((prevStudents) => {
+      const result = prevStudents.map((student) => {
+        if (student.studentId === studentId) {
           const updatedAbsences = [...student.absences];
           updatedAbsences[absenceIndex].motivated = true;
           return { ...student, absences: updatedAbsences };
         }
         return student;
-      })
-    );
+      });
+      saveAbsences(
+        studentId,
+        result.find((s) => s.studentId === studentId).absences
+      );
+      return result;
+    });
     setOpenMotivateDialog(false);
   };
 
@@ -100,7 +130,7 @@ const ManageAttendance = () => {
   return (
     <Box>
       <Select
-        value={selectedCourse}
+        value={selectedCourse || ""}
         onChange={(e) => setSelectedCourse(e.target.value)}
         displayEmpty
         fullWidth
@@ -109,9 +139,9 @@ const ManageAttendance = () => {
         <MenuItem value="" disabled>
           Select a course
         </MenuItem>
-        {mockCourses.map((course) => (
-          <MenuItem key={course.id} value={course.id}>
-            {course.name}
+        {Object.entries(props.courses).map(([_, course]) => (
+          <MenuItem key={course.courseCode} value={course.courseCode}>
+            {`${course.courseName} (${course.courseCode})`}
           </MenuItem>
         ))}
       </Select>
@@ -128,8 +158,8 @@ const ManageAttendance = () => {
             </TableHead>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell align="center">{student.name}</TableCell>
+                <TableRow key={student.studentId}>
+                  <TableCell align="center">{`${student.studentFirstName} ${student.studentLastName}`}</TableCell>
                   <TableCell align="center">
                     {student.absences.length > 0 ? (
                       student.absences.map((absence, index) => (
@@ -139,7 +169,7 @@ const ManageAttendance = () => {
                             color: absence.motivated ? "green" : "red",
                           }}
                         >
-                          {absence.date}
+                          {getDateFormat(absence.date)}
                         </div>
                       ))
                     ) : (
@@ -151,7 +181,7 @@ const ManageAttendance = () => {
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => addAbsence(student.id)}
+                        onClick={() => addAbsence(student.studentId)}
                       >
                         Add Absence
                       </Button>
@@ -186,14 +216,16 @@ const ManageAttendance = () => {
                 <TableBody>
                   {selectedStudent.absences.map((absence, index) => (
                     <TableRow key={index}>
-                      <TableCell align="center">{absence.date}</TableCell>
+                      <TableCell align="center">
+                        {getDateFormat(absence.date)}
+                      </TableCell>
                       <TableCell align="center">
                         {!absence.motivated && (
                           <Button
                             variant="outlined"
                             color="primary"
                             onClick={() =>
-                              motivateAbsence(selectedStudent.id, index)
+                              motivateAbsence(selectedStudent.studentId, index)
                             }
                           >
                             Motivate

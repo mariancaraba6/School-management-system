@@ -70,11 +70,11 @@ with app.app_context():
         grade10 = Grade(student4.student_id, course2.course_id, 9.00, 0, "2021-09-01")
         grade11 = Grade(student4.student_id, course3.course_id, 9.50, 0, "2021-09-01")
 
-        abscence1 = Absence(course1.course_id, student1.student_id, "2021-09-01")
-        abscence2 = Absence(course1.course_id, student1.student_id, "2021-09-02")
-        abscence3 = Absence(course1.course_id, student1.student_id, "2021-09-03")
-        abscence4 = Absence(course2.course_id, student1.student_id, "2021-09-01")
-        abscence5 = Absence(course2.course_id, student1.student_id, "2021-09-02")
+        abscence1 = Absence(course1.course_id, student1.student_id, "2021-09-01", True)
+        abscence2 = Absence(course1.course_id, student1.student_id, "2021-09-02", False)
+        abscence3 = Absence(course1.course_id, student1.student_id, "2021-09-03", True)
+        abscence4 = Absence(course2.course_id, student1.student_id, "2021-09-01", False)
+        abscence5 = Absence(course2.course_id, student1.student_id, "2021-09-02", True)
 
         db.session.add_all([account1, account2, account3, account4, account5])
         db.session.add_all([student1, student2, student3, student4])

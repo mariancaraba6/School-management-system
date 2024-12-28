@@ -17,61 +17,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const mockCourses = [
-  { id: "course1", name: "Mathematics", studentCount: 30 },
-  { id: "course2", name: "Physics", studentCount: 25 },
-  { id: "course3", name: "Chemistry", studentCount: 20 },
-];
-
-const mockStudents = {
-  course1: [
-    {
-      id: "student1",
-      name: "John Doe",
-      grades: [
-        { description: "Test 1", grade: 8, percentage: 0.4 },
-        { description: "Test 2", grade: null, percentage: 0.6 },
-      ],
-      absences: [
-        { date: "2024-01-01T10:00:00" },
-        { date: "2024-01-15T14:30:00" },
-      ],
-    },
-    {
-      id: "student2",
-      name: "Jane Smith",
-      grades: [
-        { description: "Assignment", grade: 7, percentage: 0.5 },
-        { description: "Final Exam", grade: null, percentage: 0.5 },
-      ],
-      absences: [],
-    },
-  ],
-  course2: [
-    {
-      id: "student3",
-      name: "Albert Einstein",
-      grades: [{ description: "Midterm", grade: 10, percentage: 1 }],
-      absences: [{ date: "2024-02-01T08:00:00" }],
-    },
-  ],
-  course3: [
-    {
-      id: "student4",
-      name: "Marie Curie",
-      grades: [
-        { description: "Lab Work", grade: 9, percentage: 0.4 },
-        { description: "Theory Exam", grade: null, percentage: 0.6 },
-      ],
-      absences: [],
-    },
-  ],
-};
-
 const getFinalGrade = (grades) => {
   let final = 0;
   for (const grade of grades) {
-    if (grade.grade === null) {
+    if (grade.grade === 0) {
       return ["-", "black"];
     }
     final += grade.grade * grade.percentage;
@@ -84,27 +33,18 @@ const getDateFormat = (date) => {
   let year = now.getFullYear();
   let month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-based
   let day = now.getDate().toString().padStart(2, "0");
-  let hour = now.getHours().toString().padStart(2, "0");
-  let minute = now.getMinutes().toString().padStart(2, "0");
 
-  let formattedDate = `${year}-${month}-${day} ${hour}:${minute}`;
+  let formattedDate = `${year}-${month}-${day}`;
   return formattedDate;
 };
 
-const MyCourses = () => {
-  const [courses, setCourses] = useState([]);
+const MyCourses = (props) => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    // Simulate fetching courses from the backend
-    setCourses(mockCourses);
-  }, []);
-
-  useEffect(() => {
     if (selectedCourse) {
-      // Simulate fetching students for the selected course
-      setStudents(mockStudents[selectedCourse] || []);
+      setStudents(props.courses[selectedCourse]["enroledStudents"]);
     }
   }, [selectedCourse]);
 
@@ -120,9 +60,9 @@ const MyCourses = () => {
         <MenuItem value="" disabled>
           Select a course
         </MenuItem>
-        {courses.map((course) => (
-          <MenuItem key={course.id} value={course.id}>
-            {course.name}
+        {Object.entries(props.courses).map(([_, course]) => (
+          <MenuItem key={course.courseCode} value={course.courseCode}>
+            {`${course.courseName} (${course.courseCode})`}
           </MenuItem>
         ))}
       </Select>
@@ -140,8 +80,8 @@ const MyCourses = () => {
             </TableHead>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell align="center">{student.name}</TableCell>
+                <TableRow key={student.studentId}>
+                  <TableCell align="center">{`${student.studentFirstName} ${student.studentLastName}`}</TableCell>
                   <TableCell
                     align="center"
                     style={{ color: getFinalGrade(student.grades)[1] }}
@@ -178,10 +118,15 @@ const MyCourses = () => {
                                   <TableCell
                                     align="center"
                                     style={{
-                                      color: grade.grade >= 5 ? "green" : "red",
+                                      color:
+                                        grade.grade === 0
+                                          ? "black"
+                                          : grade.grade >= 5
+                                          ? "green"
+                                          : "red",
                                     }}
                                   >
-                                    {grade.grade === null ? "-" : grade.grade}
+                                    {grade.grade === 0 ? "-" : grade.grade}
                                   </TableCell>
                                   <TableCell align="center">
                                     {(grade.percentage * 100).toFixed(2)}%
@@ -208,7 +153,13 @@ const MyCourses = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                           {student.absences.map((absence, idx) => (
-                            <Typography align="center" key={idx}>
+                            <Typography
+                              align="center"
+                              key={idx}
+                              style={{
+                                color: absence.motivated ? "green" : "red",
+                              }}
+                            >
                               {getDateFormat(absence.date)}
                             </Typography>
                           ))}
