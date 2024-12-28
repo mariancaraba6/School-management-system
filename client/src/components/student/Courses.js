@@ -123,7 +123,13 @@ const Courses = ({ courses }) => {
                       <TableBody>
                         {course.absences.map((absence, idx) => (
                           <TableRow key={idx}>
-                            <TableCell>{getDateFormat(absence.date)}</TableCell>
+                            <TableCell
+                              style={{
+                                color: absence.motivated ? "green" : "red",
+                              }}
+                            >
+                              {getDateFormat(absence.date)}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

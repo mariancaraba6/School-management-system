@@ -12,17 +12,17 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import { enrolForCourseRequest } from "../../api/student";
 
-const Enrolment = ({ courses }) => {
+const Enrolment = ({ courses, enroled, reload }) => {
   const [searchQuery, setSearchQuery] = useState(""); // Holds the search term
-  const [enrolledCourses, setEnrolledCourses] = useState([]); // Stores enrolled courses
-
+  const [enrolledCourses, setEnrolledCourses] = useState(enroled); // Stores enrolled courses
   // Map incoming courses data to the expected format
   const mappedCourses = courses.map((course) => ({
     course_id: course.courseCode || "-", // Maps courseCode to course_id
     course_name: course.courseName || "N/A", // Maps courseName to course_name
-    course_description: course.description || "No description available",
-    course_credits: course.credits || 0,
+    course_description: course.courseDescription || "No description available",
+    course_credits: course.courseCredits || 0,
   }));
 
   // Filtered courses based on the search query
@@ -33,16 +33,22 @@ const Enrolment = ({ courses }) => {
           course.course_id.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-  // Function to handle enrolling in a course
-  const handleEnrol = async (courseId) => {
+  const handleEnrol = async (courseCode) => {
     try {
-      const studentId = "student123"; // Replace this with the logged-in student's ID
-      console.log(`Enrolling in course: ${courseId} for student: ${studentId}`);
-      alert("Enrolled successfully!");
-      setEnrolledCourses((prev) => [...prev, courseId]);
+      console.log(`Enrolling in course: ${courseCode}`);
+      setEnrolledCourses((prev) => [...prev, courseCode]);
+
+      const response = await enrolForCourseRequest(courseCode);
+      console.log("Response:", response);
+      if (response.status === 200) {
+        reload();
+        return;
+      }
+      if (response.status !== 200) {
+        throw new Error(`Status: ${response.status}`);
+      }
     } catch (error) {
       console.error("Error enrolling in course:", error);
-      alert("Failed to enrol. Please try again.");
     }
   };
 

@@ -18,6 +18,15 @@ export const getGradesRequest = async () => {
   });
 };
 
+export const getAllCoursesRequest = async () => {
+  return fetch(URL + "student/courses", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+};
+
 export const submitGradeRequest = async (courseId, studentId, grades) => {
   return fetch(URL + "professor/grades", {
     method: "POST",
@@ -37,5 +46,16 @@ export const submitAbsenceRequest = async (courseId, studentId, absences) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ courseId, studentId, absences }),
+  });
+};
+
+export const enrolForCourseRequest = async (courseCode) => {
+  return fetch(URL + "student/enrolment", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ courseCode }),
   });
 };

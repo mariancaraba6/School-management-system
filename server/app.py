@@ -47,6 +47,8 @@ with app.app_context():
         course1 = Course("MATH01", professor1.professor_id, "Mathematics", "Basic mathematics course", 5, [[1.00, "Final exam"]])
         course2 = Course("PHYS01", professor1.professor_id, "Physics", "Basic physics course", 5, [[0.30, "Assignment"], [0.70, "Final exam"]])
         course3 = Course("INFO01", professor1.professor_id, "Informatics", "Basic informatics course", 5, [[0.30, "Midterm exam"], [0.20, "Project"], [0.50, "Final exam"]])
+        course4 = Course("English", professor1.professor_id, "English", "Basic english course", 5, [[0.40, "Assignment"], [0.60, "Final exam"]])
+        course5 = Course("Chemistry", professor1.professor_id, "Chemistry", "Basic chemistry course", 5, [[0.30, "Midterm exam"], [0.70, "Final exam"]])
 
         enrolment1 = Enrolment(course1.course_id, student1.student_id)
         enrolment2 = Enrolment(course2.course_id, student1.student_id)
@@ -84,7 +86,7 @@ with app.app_context():
         db.session.add_all([student1, student2, student3, student4])
         db.session.add_all([professor1])
         db.session.add_all([enrolment1, enrolment2, enrolment3, enrolment4, enrolment5, enrolment6, enrolment7, enrolment8, enrolment9])
-        db.session.add_all([course1, course2, course3])
+        db.session.add_all([course1, course2, course3, course4, course5])
         db.session.add_all([grade1, grade2, grade3, grade4, grade5, grade6, grade7, grade8, grade9, grade10, grade11])
         db.session.add_all([abscence1, abscence2, abscence3, abscence4, abscence5])
 
