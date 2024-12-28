@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import db, Account, Student, Professor
+from models import db, Account, Student, Professor, Admin
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 login_bp = Blueprint('login', __name__)
@@ -31,6 +31,13 @@ def login_user():
             token = create_access_token(identity=f"{account.role} {professor.professor_id}")
             return jsonify({"token": token}), 200
         
+        if account.role == "admin":
+            admin = Admin.query.filter_by(email=account.email).first()
+            if admin is None:
+                return jsonify({"error": "Admin not found"}), 404
+            token = create_access_token(identity=f"{account.role} {admin.admin_id}")
+            return jsonify({"token": token}), 200
+        
         return jsonify({"error": "Invalid role"}), 400
 
     except Exception as e:
@@ -54,6 +61,11 @@ def verify_account():
         if role == "professor":
             professor = Professor.query.filter_by(professor_id=id).first()
             if professor:
+                return jsonify({"message": "Account is valid", "role": role, "id": id}), 200
+            
+        if role == "admin":
+            admin = Admin.query.filter_by(admin_id=id).first()
+            if admin:
                 return jsonify({"message": "Account is valid", "role": role, "id": id}), 200
     except Exception as e:
         print(e)

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
-from models import db, Account, Student, Grade, Course, Absence, Professor, Enrolment
+from models import db, Account, Student, Grade, Course, Absence, Professor, Enrolment, Admin
 from routes import jwt, student_bp, login_bp, professor_bp
 
 app = Flask(__name__)
@@ -29,11 +29,14 @@ with app.app_context():
     db.create_all()
 
     if not Account.query.first():  # Check if there are any accounts
+        account0 = Account("molnar@admin.com", "molmol123", "admin")
         account1 = Account("carabinierii@gmail.com", "carab123%", "student")
         account2 = Account("sandor_niko@eminescusm.ro", "niko123", "professor")
         account3 = Account("misha7@gmail.com", "fcsb#123", "student")
         account4 = Account("vldvld@gmail.com", "vld123", "student")
         account5 = Account("grigory@gmail.com", "grigri123", "student")
+
+        admin1 = Admin("Molnar", "Mock", account0.email, "MOL01")
 
         student1 = Student("Caraba", "Mirel", account1.email, "CRB06", "BSc CSE Y1")
         student2 = Student("Misha", "David", account3.email, "MHD07", "BSc CSE Y1")
@@ -76,7 +79,8 @@ with app.app_context():
         abscence4 = Absence(course2.course_id, student1.student_id, "2021-09-01", False)
         abscence5 = Absence(course2.course_id, student1.student_id, "2021-09-02", True)
 
-        db.session.add_all([account1, account2, account3, account4, account5])
+        db.session.add_all([account0, account1, account2, account3, account4, account5])
+        db.session.add_all([admin1])
         db.session.add_all([student1, student2, student3, student4])
         db.session.add_all([professor1])
         db.session.add_all([enrolment1, enrolment2, enrolment3, enrolment4, enrolment5, enrolment6, enrolment7, enrolment8, enrolment9])
