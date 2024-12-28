@@ -39,13 +39,9 @@ const getDateFormat = (date) => {
   return formattedDate;
 };
 
-const GradesSection = ({ courses }) => {
+const Courses = ({ courses }) => {
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>
-        Courses Overview
-      </Typography>
-
       {courses.map((course, index) => {
         const finalGrade = getFinalGrade(course.grades);
         return (
@@ -145,4 +141,4 @@ const GradesSection = ({ courses }) => {
   );
 };
 
-export default GradesSection;
+export default Courses;

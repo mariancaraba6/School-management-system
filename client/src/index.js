@@ -12,7 +12,10 @@ const modernTheme = createTheme({
       main: "#1976d2", // Blue
     },
     secondary: {
-      main: "#ff4081", // Pink
+      main: "#800020", // burgundy
+    },
+    compl: {
+      main: "#008060", // green
     },
     background: {
       default: "#f5f5f5", // Light gray background

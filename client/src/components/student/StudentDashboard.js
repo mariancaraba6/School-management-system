@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
-import GradesSection from "./GradesSection";
+import Courses from "./Courses";
+import Enrolment from "./Enrolment";
 import { getDetailsRequest, getGradesRequest } from "../../api/student";
 import { useNavigate } from "react-router-dom";
+import Chat from "./Chat";
 
 const StudentDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -80,29 +82,71 @@ const StudentDashboard = () => {
       <Paper elevation={3} sx={{ padding: 3, marginTop: 2 }}>
         {tabIndex === 0 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="primary">
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="secondary"
+              sx={{ fontWeight: "bold" }}
+            >
               Courses
             </Typography>
-            <GradesSection courses={grades} />
+            <Courses courses={grades} />
           </Box>
         )}
 
         {tabIndex === 1 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="textSecondary">
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="secondary"
+              sx={{ fontWeight: "bold" }}
+            >
+              Enrolment
+            </Typography>
+            {console.log(grades)}
+            <Enrolment courses={grades} />
+          </Box>
+        )}
+
+        {tabIndex === 2 && (
+          <Box>
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="compl"
+              sx={{ fontWeight: "bold" }}
+            >
+              Chat
+            </Typography>
+            {console.log(grades)}
+            <Chat />
+          </Box>
+        )}
+
+        {tabIndex === 3 && (
+          <Box>
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="primary"
+              sx={{ fontWeight: "bold" }}
+            >
               Personal Details
             </Typography>
-            {studentDetails && (
-              <>
-                <p>Class: {studentDetails.class_name}</p>
-                <p>Student ID: {studentDetails.student_id}</p>
-                <p>
-                  Name:{" "}
-                  {studentDetails.first_name + " " + studentDetails.last_name}
-                </p>
-                <p>Email: {studentDetails.email}</p>
-              </>
-            )}
+            <Typography variant="body1">
+              {studentDetails && (
+                <>
+                  <p>Class: {studentDetails.class_name}</p>
+                  <p>Student ID: {studentDetails.student_id}</p>
+                  <p>
+                    Name:{" "}
+                    {studentDetails.first_name + " " + studentDetails.last_name}
+                  </p>
+                  <p>Email: {studentDetails.email}</p>
+                </>
+              )}
+            </Typography>
           </Box>
         )}
       </Paper>
