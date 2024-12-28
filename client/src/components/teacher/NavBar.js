@@ -47,6 +47,11 @@ const NavBar = ({ tabIndex, handleTabChange, onLogout }) => {
         >
           <Tab
             icon={<AssignmentIcon />}
+            label="My courses"
+            sx={{ textTransform: "none", fontSize: "1rem" }}
+          />
+          <Tab
+            icon={<SchoolIcon />}
             label="Manage Grades"
             sx={{ textTransform: "none", fontSize: "1rem" }}
           />

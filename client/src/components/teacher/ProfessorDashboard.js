@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import NavBar from "./NavBar";
-import GradesManagementSection from "./GradesManagementSection";
-import AttendanceSection from "./AttendanceSection";
+import ManageGrades from "./ManageGrades";
+import ManageAttendance from "./ManageAttendance";
 import { useNavigate } from "react-router-dom";
+import MyCourses from "./MyCourses";
 
 const ProfessorDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -29,29 +30,40 @@ const ProfessorDashboard = () => {
         {tabIndex === 0 && (
           <Box>
             <Typography variant="h4" gutterBottom color="primary">
-              Manage Grades
+              My Courses
             </Typography>
-            <GradesManagementSection />
+            <MyCourses />
           </Box>
         )}
 
         {tabIndex === 1 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="secondary">
-              Manage Attendance
+            <Typography variant="h4" gutterBottom color="primary">
+              Manage Grades
             </Typography>
-            <AttendanceSection />
+            <ManageGrades />
           </Box>
         )}
 
         {tabIndex === 2 && (
           <Box>
-            <Typography variant="h4" gutterBottom color="textSecondary">
+            <Typography variant="h4" gutterBottom color="secondary">
+              Manage Attendance
+            </Typography>
+            <ManageAttendance />
+          </Box>
+        )}
+
+        {tabIndex === 3 && (
+          <Box>
+            <Typography variant="h4" gutterBottom color="secondary">
               Personal Details
             </Typography>
-            <p>Name: John Doe</p>
-            <p>Email: johndoe@example.com</p>
-            <p>Subject: Mathematics</p>
+            <Typography variant="body1">
+              <p>Name: John Doe</p>
+              <p>Email: johndoe@example.com</p>
+              <p>Subject: Mathematics</p>
+            </Typography>
           </Box>
         )}
       </Paper>
