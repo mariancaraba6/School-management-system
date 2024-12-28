@@ -69,7 +69,10 @@ const ManageGrades = (props) => {
         student.studentId,
         student.grades
       );
-      console.log("Response: ", response);
+      if (response.status === 200) {
+        console.log("Grades saved successfully.");
+        return;
+      }
       if (response.status >= 400 && response.status < 500) {
         const message = await response.json();
         console.error("Error saving grades: ", message);

@@ -39,8 +39,8 @@ const Enrolment = ({ courses, enroled, reload }) => {
       setEnrolledCourses((prev) => [...prev, courseCode]);
 
       const response = await enrolForCourseRequest(courseCode);
-      console.log("Response:", response);
       if (response.status === 200) {
+        console.log("Successfully enrolled in course.");
         reload();
         return;
       }

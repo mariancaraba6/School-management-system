@@ -112,19 +112,7 @@ const ProfessorDashboard = () => {
             </Box>
           )}
 
-          {tabIndex === 3 && (
-            <Box>
-              <Typography
-                variant="h4"
-                gutterBottom
-                color="compl"
-                sx={{ fontWeight: "bold" }}
-              >
-                Chat
-              </Typography>
-              <Chat />
-            </Box>
-          )}
+          {tabIndex === 3 && <Chat />}
 
           {tabIndex === 4 && (
             <Box>

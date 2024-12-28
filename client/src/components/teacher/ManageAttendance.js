@@ -64,7 +64,10 @@ const ManageAttendance = (props) => {
         student.studentId,
         absences
       );
-      console.log("Response: ", response);
+      if (response.status === 200) {
+        console.log("Absences saved successfully.");
+        return;
+      }
       if (response.status >= 400 && response.status < 500) {
         const message = await response.json();
         console.error("Error saving absences: ", message);
