@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { addCourseRequest } from "../../api/admin";
 
 const AddCourses = () => {
   const [formData, setFormData] = useState({
@@ -87,16 +88,24 @@ const AddCourses = () => {
 
     try {
       console.log("Submitting course data:", formData);
-
-      setFormData({
-        course_id: "",
-        professor_id: "",
-        course_name: "",
-        course_description: "",
-        course_credits: "",
-        grade_components: [],
-      });
-      setSuccessMessage("Course added successfully!");
+      const response = await addCourseRequest(formData);
+      if (response.status >= 400 && response.status < 600) {
+        const error = await response.json();
+        setErrorMessage(error.error);
+        return;
+      }
+      if (response.status >= 200 && response.status < 300) {
+        // Reset form after successful submission
+        setFormData({
+          course_id: "",
+          professor_id: "",
+          course_name: "",
+          course_description: "",
+          course_credits: "",
+          grade_components: [],
+        });
+        setSuccessMessage("Course added successfully!");
+      }
     } catch (error) {
       console.error("Error adding course:", error);
       setErrorMessage("Failed to add course. Please try again.");

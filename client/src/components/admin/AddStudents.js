@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { addStudentRequest } from "../../api/admin";
 
 const AddStudents = () => {
   const [formData, setFormData] = useState({
@@ -47,17 +48,24 @@ const AddStudents = () => {
     try {
       // Simulate API request to add student
       console.log("Submitting student data:", formData);
-
-      // Reset form after successful submission
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        student_id: "",
-        class_name: "",
-        password: "",
-      });
-      setSuccessMessage("Student added successfully!");
+      const response = await addStudentRequest(formData);
+      if (response.status >= 400 && response.status < 600) {
+        const error = await response.json();
+        setErrorMessage(error.error);
+        return;
+      }
+      if (response.status >= 200 && response.status < 300) {
+        // Reset form after successful submission
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          student_id: "",
+          class_name: "",
+          password: "",
+        });
+        setSuccessMessage("Student added successfully!");
+      }
     } catch (error) {
       console.error("Error adding student:", error);
       setErrorMessage("Failed to add student. Please try again.");

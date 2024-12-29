@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { addProfessorRequest } from "../../api/admin";
 
 const AddProfessors = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const AddProfessors = () => {
     last_name: "",
     email: "",
     professor_id: "",
+    password: "",
   });
 
   const [successMessage, setSuccessMessage] = useState("");
@@ -34,7 +36,8 @@ const AddProfessors = () => {
       !formData.first_name ||
       !formData.last_name ||
       !formData.email ||
-      !formData.professor_id
+      !formData.professor_id ||
+      !formData.password
     ) {
       setErrorMessage("Please fill in all fields.");
       return;
@@ -43,15 +46,23 @@ const AddProfessors = () => {
     try {
       // Simulate API request to add professor
       console.log("Submitting professor data:", formData);
-
-      // Reset form after successful submission
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        professor_id: "",
-      });
-      setSuccessMessage("Professor added successfully!");
+      const response = await addProfessorRequest(formData);
+      if (response.status >= 400 && response.status < 600) {
+        const error = await response.json();
+        setErrorMessage(error.error);
+        return;
+      }
+      if (response.status >= 200 && response.status < 300) {
+        // Reset form after successful submission
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          professor_id: "",
+          password: "",
+        });
+        setSuccessMessage("Professor added successfully!");
+      }
     } catch (error) {
       console.error("Error adding professor:", error);
       setErrorMessage("Failed to add professor. Please try again.");

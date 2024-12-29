@@ -6,7 +6,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from models import db, Account, Student, Grade, Course, Absence, Professor, Enrolment, Admin, Message
-from routes import jwt, student_bp, login_bp, professor_bp, chat_bp
+from routes import jwt, student_bp, login_bp, professor_bp, chat_bp, admin_bp
 
 app = Flask(__name__)
 load_dotenv()
@@ -20,6 +20,7 @@ app.register_blueprint(login_bp, url_prefix='/api')
 app.register_blueprint(student_bp, url_prefix='/api')
 app.register_blueprint(professor_bp, url_prefix='/api')
 app.register_blueprint(chat_bp, url_prefix='/api')
+app.register_blueprint(admin_bp, url_prefix='/api')
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
