@@ -167,6 +167,7 @@ def post_professor_absences():
         student_id = data["studentId"]
         course_id = data["courseId"]
         absences = data["absences"]
+        print(absences)
 
         professor = Professor.query.filter_by(professor_id=professor_id).first()
         if professor is None:

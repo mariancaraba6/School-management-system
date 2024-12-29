@@ -93,10 +93,7 @@ const ManageAttendance = (props) => {
         }
         return student;
       });
-      saveAbsences(
-        studentId,
-        result.find((s) => s.studentId === studentId).absences
-      );
+      saveAbsences(studentId, [{}]);
       return result;
     });
   };
