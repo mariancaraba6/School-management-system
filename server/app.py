@@ -40,9 +40,9 @@ with app.app_context():
 
         admin1 = Admin("Molnar", "Mock", account0.email, "MOL01")
 
-        student1 = Student("Caraba", "Mirel", account1.email, "CRB06", "BSc CSE Y1")
-        student2 = Student("Misha", "David", account3.email, "MHD07", "BSc CSE Y1")
-        student3 = Student("Vlad", "Roatis", account4.email, "VLD08", "BSc CSE Y1")
+        student1 = Student("Caraba", "Mirel", account1.email, "CRB06", "BSc CSE Y1", "https://scontent.ftsr1-1.fna.fbcdn.net/v/t1.6435-1/34398662_1679208785528166_2251903043224207360_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=100&ccb=1-7&_nc_sid=e99d92&_nc_ohc=-7V_4n7-I9gQ7kNvgES2ATK&_nc_zt=24&_nc_ht=scontent.ftsr1-1.fna&_nc_gid=AhpQRj26YtJfYEgmJ1Y6MQP&oh=00_AYDYzLDVK05X1FTEMxEnVj3SYCNgLa4bNEqx_zdTCN_L9Q&oe=67991CFC")
+        student2 = Student("Misha", "David", account3.email, "MHD07", "BSc CSE Y1", "https://scontent.ftsr1-2.fna.fbcdn.net/v/t39.30808-6/463085582_2806213079547883_1965533098475735546_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=qnCKNoaHNhMQ7kNvgFeIF7w&_nc_zt=23&_nc_ht=scontent.ftsr1-2.fna&_nc_gid=AJsGGMh0ghDNusCmXhieuMb&oh=00_AYAG2yTZKUDpDZFuCklfMYoxcR1DWm-D3O3fPYe9xtbZDA&oe=67763254")
+        student3 = Student("Vlad", "Roatis", account4.email, "VLD08", "BSc CSE Y1", "https://media.licdn.com/dms/image/v2/D4E03AQEMDtR0xzmUag/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1709290818424?e=1741219200&v=beta&t=xMgWAHs3E2Mc67_fgW4wv9AihiKySo7tIFEkCf2ruac")
         student4 = Student("Grigory", "Octav", account5.email, "GRO09", "BSc CSE Y1")
         professor1 = Professor("Sandor", "Nicolae", account2.email, "SND01")
         

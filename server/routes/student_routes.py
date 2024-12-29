@@ -57,7 +57,7 @@ def get_student_details():
             return jsonify({"error": "Student not found"}), 404
 
         return jsonify({"first_name": student.first_name, "last_name": student.last_name, "email": student.email, "student_id": student.student_id, 
-                        "class_name": student.class_name}), 200
+                        "class_name": student.class_name, "image_path": student.image_path}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500

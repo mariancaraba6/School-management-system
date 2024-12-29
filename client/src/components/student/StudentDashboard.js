@@ -127,16 +127,18 @@ const StudentDashboard = () => {
               </Typography>
               {studentData["details"] && (
                 <>
-                  <img
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      border: "2px solid #ccc",
-                    }}
-                    src="https://scontent.ftsr1-2.fna.fbcdn.net/v/t39.30808-6/463085582_2806213079547883_1965533098475735546_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=qnCKNoaHNhMQ7kNvgFeIF7w&_nc_zt=23&_nc_ht=scontent.ftsr1-2.fna&_nc_gid=AJsGGMh0ghDNusCmXhieuMb&oh=00_AYAG2yTZKUDpDZFuCklfMYoxcR1DWm-D3O3fPYe9xtbZDA&oe=67763254"
-                  />
+                  {studentData["details"]["image_path"] && (
+                    <img
+                      style={{
+                        width: "150px",
+                        height: "150px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "2px solid #ccc",
+                      }}
+                      src={studentData["details"]["image_path"]}
+                    />
+                  )}
                   <p>Class: {studentData["details"].class_name}</p>
                   <p>Student ID: {studentData["details"].student_id}</p>
                   <p>
