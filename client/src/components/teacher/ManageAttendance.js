@@ -1,5 +1,5 @@
 // ManageAttendance.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Typography,
   Table,
@@ -20,6 +20,8 @@ import {
   Stack,
 } from "@mui/material";
 import { submitAbsenceRequest } from "../../api/student";
+import LoadingPage from "../../LoadingPage";
+import { getGradesRequest } from "../../api/professor";
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -39,33 +41,44 @@ const getDateFormat = (date) => {
   return formattedDate;
 };
 
-const ManageAttendance = (props) => {
+const ManageAttendance = () => {
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState(null);
   const [openMotivateDialog, setOpenMotivateDialog] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  useEffect(() => {
-    if (selectedCourse) {
-      setStudents(props.courses[selectedCourse]["enroledStudents"]);
+  const fetchStudentAbsences = useCallback(async () => {
+    setStudents(null);
+    try {
+      const response = await getGradesRequest();
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("Student absences: ", data);
+        setStudents(data["courses"]);
+      }
+    } catch (error) {
+      console.error("Error getting student absences: ", error);
     }
-  }, [selectedCourse]);
+  }, []);
+
+  useEffect(() => {
+    fetchStudentAbsences();
+  }, [fetchStudentAbsences]);
 
   const saveAbsences = async (studentId, absences) => {
     try {
-      const student = students.find((s) => s.studentId === studentId);
-      if (!student) return;
       console.log(
-        `Saving absences for course ${selectedCourse} for student ${student.studentId}`,
+        `Saving absences for course ${selectedCourse} for student ${studentId}`,
         absences
       );
       const response = await submitAbsenceRequest(
         selectedCourse,
-        student.studentId,
+        studentId,
         absences
       );
       if (response.status === 200) {
-        console.log("Absences saved successfully.");
+        console.log("The absence added/updated successfully.");
+        fetchStudentAbsences();
         return;
       }
       if (response.status >= 400 && response.status < 500) {
@@ -79,42 +92,23 @@ const ManageAttendance = (props) => {
   };
 
   const addAbsence = (studentId) => {
-    const currentDate = getCurrentDate();
-    setStudents((prevStudents) => {
-      const result = prevStudents.map((student) => {
-        if (student.studentId === studentId) {
-          return {
-            ...student,
-            absences: [
-              ...student.absences,
-              { date: currentDate, motivated: false },
-            ],
-          };
-        }
-        return student;
-      });
-      saveAbsences(studentId, [{}]);
-      return result;
-    });
+    saveAbsences(studentId, [{}]);
   };
 
   const motivateAbsence = (studentId, absenceIndex) => {
-    setStudents((prevStudents) => {
-      const result = prevStudents.map((student) => {
-        if (student.studentId === studentId) {
-          const updatedAbsences = [...student.absences];
-          updatedAbsences[absenceIndex].motivated = true;
-          return { ...student, absences: updatedAbsences };
-        }
-        return student;
-      });
-      saveAbsences(
-        studentId,
-        result.find((s) => s.studentId === studentId).absences
+    try {
+      const student = students[selectedCourse]["enroledStudents"].find(
+        (x) => x.studentId === studentId
       );
-      return result;
-    });
-    setOpenMotivateDialog(false);
+      if (!student) {
+        return;
+      }
+      student.absences[absenceIndex].motivated = true;
+      saveAbsences(studentId, [student.absences[absenceIndex]]);
+      setOpenMotivateDialog(false);
+    } catch (error) {
+      console.error("Error motivating absence: ", error);
+    }
   };
 
   const handleOpenMotivateDialog = (student) => {
@@ -126,6 +120,10 @@ const ManageAttendance = (props) => {
     setOpenMotivateDialog(false);
     setSelectedStudent(null);
   };
+
+  if (students === null) {
+    return <LoadingPage />;
+  }
 
   return (
     <Box>
@@ -139,7 +137,7 @@ const ManageAttendance = (props) => {
         <MenuItem value="" disabled>
           Select a course
         </MenuItem>
-        {Object.entries(props.courses).map(([_, course]) => (
+        {Object.entries(students).map(([_, course]) => (
           <MenuItem key={course.courseCode} value={course.courseCode}>
             {`${course.courseName} (${course.courseCode})`}
           </MenuItem>
@@ -157,7 +155,7 @@ const ManageAttendance = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {students.map((student) => (
+              {students[selectedCourse]["enroledStudents"].map((student) => (
                 <TableRow key={student.studentId}>
                   <TableCell align="center">{`${student.studentFirstName} ${student.studentLastName}`}</TableCell>
                   <TableCell align="center">

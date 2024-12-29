@@ -108,7 +108,7 @@ const ProfessorDashboard = () => {
               >
                 Manage Attendance
               </Typography>
-              <ManageAttendance courses={professorData["courses"]} />
+              <ManageAttendance />
             </Box>
           )}
 
