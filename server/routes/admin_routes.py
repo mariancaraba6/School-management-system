@@ -28,14 +28,14 @@ def create_student():
         if len(first_name) == 0 or len(last_name) == 0 or len(email) == 0 or len(password) == 0 or len(class_name) == 0 or len(student_id) == 0:
             return jsonify({"error": "Empty fields"}), 400
 
-        existing_account = Account.query.filter_by(email=email).first()
-        if existing_account is not None:
+        existing_email_account = Account.query.filter_by(email=email).first()
+        if existing_email_account is not None:
             return jsonify({"error": "Email already exists"}), 400
-        existing_student = Student.query.filter_by(student_id=student_id).first()
-        if existing_student is not None:
+        existing_id_account = Account.query.filter_by(account_id=student_id).first()
+        if existing_id_account is not None:
             return jsonify({"error": "Student ID already exists"}), 400
         
-        account = Account(email, password, "student")
+        account = Account(student_id, email, password, "student")
         student = Student(first_name, last_name, email, student_id, class_name)
         db.session.add(account)
         db.session.add(student)
@@ -67,14 +67,14 @@ def create_professor():
         if len(first_name) == 0 or len(last_name) == 0 or len(email) == 0 or len(password) == 0 or len(professor_id) == 0:
             return jsonify({"error": "Empty fields"}), 400
 
-        existing_account = Account.query.filter_by(email=email).first()
-        if existing_account is not None:
+        existing_email_account = Account.query.filter_by(email=email).first()
+        if existing_email_account is not None:
             return jsonify({"error": "Email already exists"}), 400
-        existing_professor = Professor.query.filter_by(professor_id=professor_id).first()
-        if existing_professor is not None:
+        existing_id_account = Account.query.filter_by(account_id=professor_id).first()
+        if existing_id_account is not None:
             return jsonify({"error": "Professor ID already exists"}), 400
         
-        account = Account(email, password, "professor")
+        account = Account(professor_id, email, password, "professor")
         professor = Professor(first_name, last_name, email, professor_id)
         db.session.add(account)
         db.session.add(professor)

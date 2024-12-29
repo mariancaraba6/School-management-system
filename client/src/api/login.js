@@ -21,3 +21,23 @@ export const verifyAccountRequest = () => {
     },
   });
 };
+
+export const enableTwoFactorAuthRequest = () => {
+  return fetch(URL + "setup-otp", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+};
+
+export const verifyOTPRequest = (otp) => {
+  return fetch(URL + "verify-otp", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ otp }),
+  });
+};

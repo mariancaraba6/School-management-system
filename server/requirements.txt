@@ -2,5 +2,9 @@ flask
 flask_sqlalchemy
 flask_cors
 flask_jwt_extended
+flask_wtf
 psycopg2-binary
 python-dotenv
+qrcode
+pyotp
+pillow

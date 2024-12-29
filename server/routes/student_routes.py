@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import db, Student, Grade, Course, Absence, Enrolment
+from models import db, Student, Grade, Course, Absence, Enrolment, Account
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 student_bp = Blueprint('student', __name__)
@@ -51,13 +51,18 @@ def get_student_details():
         student_id = identity.split()[1]
         if role != "student":
             return jsonify({"error": "Invalid role"}), 400
+        
+        account = Account.query.filter_by(account_id=student_id).first()
+        if account is None:
+            return jsonify({"error": "Account not found"}), 404
 
         student = Student.query.filter_by(student_id=student_id).first()
         if student is None:
             return jsonify({"error": "Student not found"}), 404
 
         return jsonify({"first_name": student.first_name, "last_name": student.last_name, "email": student.email, "student_id": student.student_id, 
-                        "class_name": student.class_name, "image_path": student.image_path}), 200
+                        "class_name": student.class_name, "image_path": student.image_path, 
+                        "is_two_factor_authentication_enabled": account.is_two_factor_authentication_enabled}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500

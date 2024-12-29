@@ -11,11 +11,16 @@ import {
 import { useNavigate } from "react-router-dom";
 import Chat from "./Chat";
 import LoadingPage from "../../LoadingPage";
+import SetupOTP from "./SetupOTP";
+import { enableTwoFactorAuthRequest } from "../../api/login";
+import VerifyOTP from "./VerifyOTP";
 
 const StudentDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [studentData, setStudentData] = useState(null);
   const navigate = useNavigate();
+  const [settingOTP, setSettingOTP] = useState(null);
+  const [verifyOTP, setVerifyOTP] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -24,6 +29,19 @@ const StudentDashboard = () => {
   const logout = () => {
     sessionStorage.removeItem("token");
     return navigate("/login");
+  };
+
+  const enableTwoFactorAuth = async () => {
+    try {
+      const response = await enableTwoFactorAuthRequest();
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("Data: ", data);
+        setSettingOTP(data);
+      }
+    } catch (error) {
+      console.error("Error enabling two factor auth: ", error);
+    }
   };
 
   const fetchStudentData = useCallback(async () => {
@@ -125,7 +143,25 @@ const StudentDashboard = () => {
               >
                 Personal Details
               </Typography>
-              {studentData["details"] && (
+              {!studentData && <LoadingPage />}
+              {verifyOTP && (
+                <VerifyOTP
+                  goBack={() => setVerifyOTP(false)}
+                  successfulSettingup={() => {
+                    fetchStudentData();
+                    setSettingOTP(null);
+                    setVerifyOTP(false);
+                  }}
+                />
+              )}
+              {!verifyOTP && studentData["details"] && settingOTP && (
+                <SetupOTP
+                  secret={settingOTP["secret"]}
+                  qr_image={settingOTP["qr_image"]}
+                  verifyOTP={() => setVerifyOTP(true)}
+                />
+              )}
+              {!verifyOTP && studentData["details"] && !settingOTP && (
                 <>
                   {studentData["details"]["image_path"] && (
                     <img
@@ -148,6 +184,17 @@ const StudentDashboard = () => {
                       studentData["details"].last_name}
                   </p>
                   <p>Email: {studentData["details"].email}</p>
+                  {studentData["details"]
+                    .is_two_factor_authentication_enabled && (
+                    <p>Two Factor Authentication is enabled!</p>
+                  )}
+                  {!studentData["details"]
+                    .is_two_factor_authentication_enabled && (
+                    <button onClick={() => enableTwoFactorAuth()}>
+                      {" "}
+                      Enable Two Factor Authentication
+                    </button>
+                  )}
                 </>
               )}
             </Box>
