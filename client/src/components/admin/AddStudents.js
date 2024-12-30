@@ -124,6 +124,8 @@ const AddStudents = () => {
                 name="student_id"
                 value={formData.student_id}
                 onChange={handleChange}
+                inputProps={{ maxLength: 10 }}
+                helperText="Must be maximum 10 characters long"
                 required
               />
             </Grid>
