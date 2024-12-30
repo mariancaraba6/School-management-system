@@ -147,7 +147,7 @@ const StudentDashboard = () => {
               {verifyOTP && (
                 <VerifyOTP
                   goBack={() => setVerifyOTP(false)}
-                  successfulSettingup={() => {
+                  successfulSettingUp={() => {
                     fetchStudentData();
                     setSettingOTP(null);
                     setVerifyOTP(false);

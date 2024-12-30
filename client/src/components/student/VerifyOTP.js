@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { verifyOTPRequest } from "../../api/login";
+import { verifyLoginOTPRequest, verifySetupOTPRequest } from "../../api/login";
 
-const VerifyOTP = ({ goBack, successfulSettingup }) => {
+const VerifyOTP = ({ goBack, successfulSettingUp, successfulLogingPage }) => {
   const inputRef = useRef(null);
   const [error, setError] = useState("");
 
@@ -9,13 +9,26 @@ const VerifyOTP = ({ goBack, successfulSettingup }) => {
     e.preventDefault();
     const otp = inputRef.current.value;
     try {
-      const response = await verifyOTPRequest(otp);
-      const data = await response.json();
-      console.log("Data: ", data);
-      console.log("Response: ", response);
-      if (response.status === 200) {
-        if (successfulSettingup) {
-          successfulSettingup();
+      if (successfulSettingUp) {
+        const response = await verifySetupOTPRequest(otp);
+        console.log("Response: ", response);
+        const data = await response.json();
+        console.log("Data: ", data);
+        if (response.status === 200) {
+          successfulSettingUp();
+          return;
+        }
+      }
+      if (successfulLogingPage) {
+        const response = await verifyLoginOTPRequest(
+          otp,
+          successfulLogingPage.temp_token
+        );
+        console.log("Response: ", response);
+        const data = await response.json();
+        console.log("Data: ", data);
+        if (response.status === 200) {
+          successfulLogingPage.next(data.token);
           return;
         }
       }

@@ -4,6 +4,10 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import InputRequired, Length
+import jwt
+import time
+import os
+import pyotp
 
 from io import BytesIO
 from base64 import b64encode
@@ -28,25 +32,26 @@ def login_user():
             student = Student.query.filter_by(email=account.email).first()
             if student is None:
                 return jsonify({"error": "Student not found"}), 404
-            token = create_access_token(identity=f"{account.role} {student.student_id}")
-            return jsonify({"token": token}), 200
         
         if account.role == "professor":
             professor = Professor.query.filter_by(email=account.email).first()
             if professor is None:
                 return jsonify({"error": "Professor not found"}), 404
-            token = create_access_token(identity=f"{account.role} {professor.professor_id}")
-            return jsonify({"token": token}), 200
         
         if account.role == "admin":
             admin = Admin.query.filter_by(email=account.email).first()
             if admin is None:
                 return jsonify({"error": "Admin not found"}), 404
-            token = create_access_token(identity=f"{account.role} {admin.admin_id}")
+            
+        if account.role not in ["student", "professor", "admin"]:
+            return jsonify({"error": "Invalid role"}), 400
+        
+        if not account.is_two_factor_authentication_enabled:
+            token = create_access_token(identity=f"{account.role} {account.account_id}")
             return jsonify({"token": token}), 200
         
-        return jsonify({"error": "Invalid role"}), 400
-
+        temp_token = jwt.encode({"account_id": account.account_id, "exp": time.time() + 300}, os.getenv("JWT_2FA_SECRET_KEY"), algorithm="HS256")
+        return jsonify({"message": "Two factor authentication is enabled", "temp_token": temp_token}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
@@ -91,7 +96,7 @@ def get_b64encoded_qr_image(data):
     return b64encode(buffered.getvalue()).decode("utf-8")
 
 
-@login_bp.route('/setup-otp', methods=['GET'])
+@login_bp.route('/setup-create-authenticator', methods=['GET'])
 @jwt_required()
 def setup_two_factor_auth():
     try:
@@ -115,7 +120,7 @@ class TwoFactorForm(FlaskForm):
                       InputRequired(), Length(min=6, max=6)])
 
 
-@login_bp.route("/verify-otp", methods=["GET", "POST"])
+@login_bp.route("/setup-verify-otp", methods=["GET", "POST"])
 @jwt_required()
 def verify_two_factor_auth():
     try:
@@ -138,6 +143,39 @@ def verify_two_factor_auth():
             return jsonify({"message": "OTP is valid"}), 200
         else:
             return jsonify({"error": "Invalid OTP"}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({"error": str(e)}), 500
+    
+
+@login_bp.route('/login-verify-otp', methods=['POST'])
+def login_verify_otp():
+    try:
+        data = request.get_json()
+        print(data)
+        if "temp_token" not in data:
+            return jsonify({"error": "Temp token is required"}), 400
+        if "otp" not in data:
+            return jsonify({"error": "OTP is required"}),
+        
+        temp_token = data.get("temp_token")
+        otp = data.get("otp")
+        try:
+            payload = jwt.decode(temp_token, os.getenv("JWT_2FA_SECRET_KEY"), algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return jsonify({"status": "error", "message": "Temporary token expired"}), 401
+        
+        account_id = payload.get("account_id")
+        current_user = Account.query.filter_by(account_id=account_id).first()
+        if current_user is None:
+            return jsonify({"error": "Account not found"}), 404
+        
+        totp = pyotp.TOTP(current_user.secret_token)
+        if not totp.verify(otp):
+            return jsonify({"status": "error", "message": "Invalid OTP"}), 401
+
+        token = create_access_token(identity=f"{current_user.role} {current_user.account_id}")
+        return jsonify({"token": token}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500

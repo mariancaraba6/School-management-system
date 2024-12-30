@@ -13,6 +13,7 @@ import MuiCard from "@mui/material/Card";
 import { loginRequest } from "../../api/login";
 import { setToken } from "../../api/utils";
 import { useNavigate } from "react-router-dom";
+import VerifyOTP from "../student/VerifyOTP";
 
 export default function LoginPage() {
   const [emailError, setEmailError] = React.useState(false);
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [accountError, setAccountError] = React.useState(false);
   const [accountErrorMessage, setAccountErrorMessage] = React.useState("");
+  const [twoFactorAuth, setTwoFactorAuth] = React.useState(false);
   const navigate = useNavigate();
 
   const sendLoginRequest = async (email, password) => {
@@ -29,12 +31,15 @@ export default function LoginPage() {
       if (response.status === 200) {
         console.log("Login successful!");
         const data = await response.json();
-        const token = data.token;
-        setToken(token);
-        console.log("Token: ", token);
-        setAccountError(false);
-        setAccountErrorMessage("");
-        return navigate("/");
+        console.log("Data: ", data);
+        if ("token" in data) {
+          const token = data.token;
+          setToken(token);
+          setAccountError(false);
+          setAccountErrorMessage("");
+          return navigate("/");
+        }
+        setTwoFactorAuth({ temp_token: data.temp_token });
       }
       setAccountError(true);
       setAccountErrorMessage("Invalid email or password.");
@@ -78,6 +83,21 @@ export default function LoginPage() {
 
     return isValid;
   };
+
+  if (twoFactorAuth) {
+    return (
+      <VerifyOTP
+        goBack={() => setTwoFactorAuth(false)}
+        successfulLogingPage={{
+          temp_token: twoFactorAuth.temp_token,
+          next: (token) => {
+            setToken(token);
+            return navigate("/");
+          },
+        }}
+      />
+    );
+  }
 
   return (
     <Stack
