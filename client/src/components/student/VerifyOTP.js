@@ -17,10 +17,15 @@ const VerifyOTP = ({ goBack, successfulSettingUp, successfulLogingPage }) => {
       if (successfulSettingUp) {
         const response = await verifySetupOTPRequest(otp);
         console.log("Response: ", response);
-        const data = await response.json();
-        console.log("Data: ", data);
         if (response.status === 200) {
+          const data = await response.json();
+          console.log("Data: ", data);
           successfulSettingUp();
+          return;
+        }
+        if (response.status >= 400 && response.status < 600) {
+          const error = await response.json();
+          setError(error.error);
           return;
         }
       }
@@ -30,10 +35,15 @@ const VerifyOTP = ({ goBack, successfulSettingUp, successfulLogingPage }) => {
           successfulLogingPage.temp_token
         );
         console.log("Response: ", response);
-        const data = await response.json();
-        console.log("Data: ", data);
         if (response.status === 200) {
+          const data = await response.json();
+          console.log("Data: ", data);
           successfulLogingPage.next(data.token);
+          return;
+        }
+        if (response.status >= 400 && response.status < 600) {
+          const error = await response.json();
+          setError(error.error);
           return;
         }
       }
@@ -82,6 +92,7 @@ const VerifyOTP = ({ goBack, successfulSettingUp, successfulLogingPage }) => {
               marginTop: 2,
               "&:hover": { backgroundColor: "#600080" },
             }}
+            onClick={verifyOTP}
           >
             Verify
           </Button>

@@ -139,7 +139,6 @@ def verify_two_factor_auth():
             if not current_user.is_two_factor_authentication_enabled:
                 current_user.is_two_factor_authentication_enabled = True
                 db.session.commit()
-                return jsonify({"message": "OTP is valid"}), 200
             return jsonify({"message": "OTP is valid"}), 200
         else:
             return jsonify({"error": "Invalid OTP"}), 400
@@ -163,7 +162,7 @@ def login_verify_otp():
         try:
             payload = jwt.decode(temp_token, os.getenv("JWT_2FA_SECRET_KEY"), algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            return jsonify({"status": "error", "message": "Temporary token expired"}), 401
+            return jsonify({"status": "error", "error": "Temporary token expired"}), 401
         
         account_id = payload.get("account_id")
         current_user = Account.query.filter_by(account_id=account_id).first()
@@ -172,7 +171,7 @@ def login_verify_otp():
         
         totp = pyotp.TOTP(current_user.secret_token)
         if not totp.verify(otp):
-            return jsonify({"status": "error", "message": "Invalid OTP"}), 401
+            return jsonify({"status": "error", "error": "Invalid OTP"}), 401
 
         token = create_access_token(identity=f"{current_user.role} {current_user.account_id}")
         return jsonify({"token": token}), 200

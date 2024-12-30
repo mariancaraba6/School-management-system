@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Button } from "@mui/material";
 import NavBar from "./NavBar";
 import ManageGrades from "./ManageGrades";
 import ManageAttendance from "./ManageAttendance";
@@ -8,15 +8,34 @@ import MyCourses from "./MyCourses";
 import Chat from "./Chat";
 import { getDetailsRequest, getGradesRequest } from "../../api/professor";
 import LoadingPage from "../../LoadingPage";
+import LinkIcon from "@mui/icons-material/Link";
+import SetupOTP from "../student/SetupOTP";
+import { enableTwoFactorAuthRequest } from "../../api/login";
+import VerifyOTP from "../student/VerifyOTP";
 
 const ProfessorDashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const navigate = useNavigate();
   const [professorData, setProfessorData] = useState(null);
+  const [settingOTP, setSettingOTP] = useState(null);
+  const [verifyOTP, setVerifyOTP] = useState(false);
 
   const logout = () => {
     sessionStorage.removeItem("token");
     return navigate("/login");
+  };
+
+  const enableTwoFactorAuth = async () => {
+    try {
+      const response = await enableTwoFactorAuthRequest();
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("Data: ", data);
+        setSettingOTP(data);
+      }
+    } catch (error) {
+      console.error("Error enabling two factor auth: ", error);
+    }
   };
 
   const handleTabChange = (event, newValue) => {
@@ -124,16 +143,72 @@ const ProfessorDashboard = () => {
               >
                 Personal Details
               </Typography>
-              {professorData["details"] && (
+              {!professorData && <LoadingPage />}
+              {verifyOTP && (
+                <VerifyOTP
+                  goBack={() => setVerifyOTP(false)}
+                  successfulSettingUp={() => {
+                    fetchProfessorData();
+                    setSettingOTP(null);
+                    setVerifyOTP(false);
+                  }}
+                />
+              )}
+              {!verifyOTP && professorData["details"] && settingOTP && (
+                <SetupOTP
+                  secret={settingOTP["secret"]}
+                  qr_image={settingOTP["qr_image"]}
+                  verifyOTP={() => setVerifyOTP(true)}
+                />
+              )}
+              {!verifyOTP && professorData["details"] && !settingOTP && (
                 <>
-                  <p>
+                  {professorData["details"]["image_path"] && (
+                    <img
+                      style={{
+                        width: "150px",
+                        height: "150px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "2px solid #ccc",
+                      }}
+                      src={professorData["details"]["image_path"]}
+                    />
+                  )}
+                  <Typography variant="body1" sx={{ marginTop: 2 }}>
                     Professor ID: {professorData["details"]["professor_id"]}
-                  </p>
-                  <p>
+                  </Typography>
+                  <Typography variant="body1">
                     Name:{" "}
                     {`${professorData["details"]["first_name"]} ${professorData["details"]["last_name"]}`}
-                  </p>
-                  <p>Email: {professorData["details"]["email"]}</p>
+                  </Typography>
+                  <Typography variant="body1">
+                    Email: {professorData["details"]["email"]}
+                  </Typography>
+                  {professorData["details"]
+                    .is_two_factor_authentication_enabled && (
+                    <p>Two Factor Authentication is enabled!</p>
+                  )}
+                  {!professorData["details"]
+                    .is_two_factor_authentication_enabled && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => enableTwoFactorAuth()}
+                      startIcon={<LinkIcon />}
+                      sx={{
+                        padding: "10px 20px",
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        backgroundColor: "#008060",
+                        marginTop: 2,
+                        "&:hover": { backgroundColor: "#600080" },
+                      }}
+                    >
+                      {" "}
+                      Enable Two Factor Authentication
+                    </Button>
+                  )}
                 </>
               )}
             </Box>

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import db, Professor, Course, Enrolment, Grade, Student, Absence
+from models import db, Professor, Course, Enrolment, Grade, Account, Student, Absence
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import date
 
@@ -19,8 +19,13 @@ def get_professor_details():
         professor = Professor.query.filter_by(professor_id=professor_id).first()
         if professor is None:
             return jsonify({"error": "Professor not found"}), 404
+        
+        account = Account.query.filter_by(account_id=professor.professor_id).first()
+        if account is None:
+            return jsonify({"error": "Account not found"}), 404
 
-        return jsonify({"first_name": professor.first_name, "last_name": professor.last_name, "email": professor.email, "professor_id": professor.professor_id}), 200
+        return jsonify({"first_name": professor.first_name, "last_name": professor.last_name, "email": professor.email, "professor_id": professor.professor_id,
+                        "is_two_factor_authentication_enabled": account.is_two_factor_authentication_enabled}), 200
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
