@@ -11,7 +11,7 @@ const SetupOTP = ({ secret, qr_image, verifyOTP }) => {
   return (
     <Box
       sx={{
-        maxWidth: "500px",
+        maxWidth: "550px",
         margin: "auto",
         padding: "2rem",
         display: "flex",

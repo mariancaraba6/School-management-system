@@ -187,17 +187,6 @@ export default function LoginPage() {
               {accountErrorMessage}
             </Typography>
           )}
-          <Link
-            component="button"
-            type="button"
-            onClick={() => {
-              console.log("Forgot password?");
-            }}
-            variant="body2"
-            sx={{ alignSelf: "center" }}
-          >
-            Forgot your password?
-          </Link>
         </Box>
       </MuiCard>
     </Stack>
