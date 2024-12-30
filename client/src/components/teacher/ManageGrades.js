@@ -181,7 +181,7 @@ const ManageGrades = (props) => {
                   <TableCell align="center">
                     <Button
                       variant="contained"
-                      color="primary"
+                      color="secondary"
                       sx={{ marginRight: 1 }}
                       onClick={() => saveGrades(student.studentId)}
                     >

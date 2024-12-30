@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Button } from "@mui/material";
 import NavBar from "./NavBar";
 import Courses from "./Courses";
 import Enrolment from "./Enrolment";
@@ -8,6 +8,7 @@ import {
   getDetailsRequest,
   getGradesRequest,
 } from "../../api/student";
+import LinkIcon from "@mui/icons-material/Link";
 import { useNavigate } from "react-router-dom";
 import Chat from "./Chat";
 import LoadingPage from "../../LoadingPage";
@@ -175,25 +176,44 @@ const StudentDashboard = () => {
                       src={studentData["details"]["image_path"]}
                     />
                   )}
-                  <p>Class: {studentData["details"].class_name}</p>
-                  <p>Student ID: {studentData["details"].student_id}</p>
-                  <p>
+                  <Typography variant="body1" sx={{ marginTop: 2 }}>
+                    Class: {studentData["details"].class_name}
+                  </Typography>
+                  <Typography variant="body1">
+                    Student ID: {studentData["details"].student_id}
+                  </Typography>
+                  <Typography variant="body1">
                     Name:{" "}
                     {studentData["details"].first_name +
                       " " +
                       studentData["details"].last_name}
-                  </p>
-                  <p>Email: {studentData["details"].email}</p>
+                  </Typography>
+                  <Typography variant="body1">
+                    Email: {studentData["details"].email}
+                  </Typography>
                   {studentData["details"]
                     .is_two_factor_authentication_enabled && (
                     <p>Two Factor Authentication is enabled!</p>
                   )}
                   {!studentData["details"]
                     .is_two_factor_authentication_enabled && (
-                    <button onClick={() => enableTwoFactorAuth()}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => enableTwoFactorAuth()}
+                      startIcon={<LinkIcon />}
+                      sx={{
+                        padding: "10px 20px",
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        backgroundColor: "#008060",
+                        marginTop: 2,
+                        "&:hover": { backgroundColor: "#600080" },
+                      }}
+                    >
                       {" "}
                       Enable Two Factor Authentication
-                    </button>
+                    </Button>
                   )}
                 </>
               )}
